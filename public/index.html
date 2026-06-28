@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WhatsApp Blast Tool</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .lang-btn {
+      position: fixed;
+      top: 14px;
+      right: 18px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.4);
+      color: #fff;
+      padding: 4px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 13px;
+      z-index: 999;
+    }
+    .lang-btn:hover { background: rgba(255,255,255,0.28); }
+  </style>
+</head>
+<body>
+  <button class="lang-btn" id="lang-toggle">EN</button>
+
+  <header>
+    <h1>📨 <span data-i18n="title">WhatsApp 群发工具</span></h1>
+    <div id="wa-status" class="status status-offline" data-i18n="status.offline">连接中…</div>
+  </header>
+
+  <main>
+    <!-- Step 1: Login -->
+    <section class="card" id="step-login">
+      <h2>① <span data-i18n="step1.title">扫码登录</span></h2>
+      <div id="qr-box">
+        <p class="hint" data-i18n="step1.starting">正在启动 WhatsApp，请稍候…</p>
+      </div>
+      <p class="hint" data-i18n="step1.hint">用手机 WhatsApp → 设置 → 已关联的设备 → 关联设备，扫描上方二维码。</p>
+    </section>
+
+    <!-- Step 2: Upload list -->
+    <section class="card" id="step-list">
+      <h2>② <span data-i18n="step2.title">上传收件人名单（Excel / CSV）</span></h2>
+      <p class="hint" data-i18n="step2.hint">第一列为手机号（建议含国家码，如 60123456789），其余列为变量（列名即变量名，如 <code>name</code>）。</p>
+      <input type="file" id="list-file" accept=".xlsx,.xls,.csv" />
+      <div id="list-result" class="result-box"></div>
+    </section>
+
+    <!-- Step 3: Message -->
+    <section class="card" id="step-message">
+      <h2>③ <span data-i18n="step3.title">编写消息</span></h2>
+      <p class="hint" data-i18n="step3.hint">用 <code>{列名}</code> 插入变量，例如：<code>你好 {name}，你的订单 {order} 已发货。</code></p>
+      <textarea id="template" rows="5" data-i18n-placeholder="step3.placeholder"></textarea>
+
+      <div class="attach-row">
+        <label data-i18n="step3.attachLabel">附件（图片 / 文件，可多选）：</label>
+        <input type="file" id="attach-files" multiple />
+        <button id="clear-attach" class="btn-secondary" data-i18n="step3.clearAttach">清空附件</button>
+      </div>
+      <div id="attach-list" class="result-box"></div>
+    </section>
+
+    <!-- Step 4: Send -->
+    <section class="card" id="step-send">
+      <h2>④ <span data-i18n="step4.title">发送</span></h2>
+      <div class="delay-row">
+        <label data-i18n="step4.delayLabel">每条间隔随机延迟：</label>
+        <input type="number" id="delay-min" min="1" /> –
+        <input type="number" id="delay-max" min="1" /> <span data-i18n="step4.seconds">秒</span>
+        <span class="hint" data-i18n="step4.delayHint">（延迟越长越不易被封号）</span>
+      </div>
+      <div class="actions">
+        <button id="btn-send" class="btn-primary" disabled data-i18n="step4.send">开始发送</button>
+        <button id="btn-stop" class="btn-danger" disabled data-i18n="step4.stop">停止</button>
+      </div>
+
+      <div id="progress-box" class="hidden">
+        <div class="progress-bar"><div id="progress-fill"></div></div>
+        <p id="progress-text">0 / 0</p>
+      </div>
+
+      <table id="results-table" class="hidden">
+        <thead><tr>
+          <th data-i18n="table.no">#</th>
+          <th data-i18n="table.phone">号码</th>
+          <th data-i18n="table.status">状态</th>
+          <th data-i18n="table.note">备注</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer>
+    <p class="hint" data-i18n="footer">⚠️ 仅向已同意接收的联系人发送。非官方网页自动化群发存在封号风险，请控制频率与数量。</p>
+  </footer>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
